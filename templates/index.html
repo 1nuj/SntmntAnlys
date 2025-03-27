@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <title>Sentiment Analysis</title>
+</head>
+<body>
+    <h1>Sentiment Analysis for Headlines</h1>
+    <form id="headlineForm">
+        <input type="text" name="headline" id="headline" placeholder="Enter a headline..." required>
+        <button type="submit">Analyze</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById("headlineForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const headline = document.getElementById("headline").value;
+            const response = await fetch("/analyze", {
+                method: "POST",
+                body: new URLSearchParams({ headline })
+            });
+            const result = await response.json();
+             // Check if results are returned
+            if (result) {
+                let output = "<h3>Sentiment Analysis Results:</h3><ul>";
+                
+                // Loop through each result and display it
+                result.forEach((res) => {
+                    output += `
+                        <li>
+                            <strong>${res.label}</strong>: ${Number(res.score).toFixed(4)}
+                        </li>
+                    `;
+                });
+
+                output += "</ul>";
+                document.getElementById("result").innerHTML = output;
+            } else {
+                document.getElementById("result").innerHTML = "Error: Invalid response from API.";
+            }
+        }
+    </script>
+</body>
+</html>
